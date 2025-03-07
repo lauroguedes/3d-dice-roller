@@ -1,5 +1,42 @@
-# Vue 3 + TypeScript + Vite
+# 3D Dice Roller
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+A realistic 3D dice roller application built with Vue 3, TypeScript, and CSS 3D transforms.
 
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+## Features
+
+- Roll 1-3 dice with realistic physics and 3D animation
+- View roll history alongside the dice
+- Calculate total values automatically
+- Toggle between light and dark theme
+- Responsive design for all device sizes
+
+## Technologies
+
+- Vue 3 with Composition API
+- TypeScript
+- CSS 3D Transforms
+- GSAP for animations
+- Vite for build tooling
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## How It Works
+
+The application uses CSS 3D transforms to create realistic dice that roll with physics-based animations. GSAP (GreenSock Animation Platform) is used to handle the complex animation sequences, including random rotations, realistic bounces, and subtle tilts for a more natural feel.
+
+The dice values are generated randomly and stored in the roll history, which is displayed in a compact panel alongside the dice. Users can clear the history at any time.
+
+## License
+
+MIT
