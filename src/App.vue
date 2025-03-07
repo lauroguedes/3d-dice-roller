@@ -132,7 +132,7 @@ onMounted(() => {
   <div class="container">
     <!-- Header -->
     <header>
-      <h1><i class="ri-shapes-line"></i> 3D Dice Roller</h1>
+      <h1><i class="ri-dice-line"></i> 3D Dice Roller</h1>
       <button class="theme-toggle" @click="toggleTheme">
         <i v-if="isDarkMode" class="ri-sun-line"></i>
         <i v-else class="ri-moon-line"></i>
@@ -253,6 +253,12 @@ footer {
 i {
   vertical-align: middle;
   margin-right: 4px;
+}
+
+h1 i {
+  font-size: 1.8rem;
+  color: var(--primary-color);
+  margin-right: 8px;
 }
 
 .theme-toggle i {
