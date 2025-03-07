@@ -13,7 +13,17 @@ const currentValue = ref(props.value);
 
 // Map dice values to specific rotations
 // These rotations are carefully calibrated to match the CSS transforms and template
-const faceRotations = {
+type Rotation = { x: number; y: number; z: number };
+type FaceRotations = { [key: number]: Rotation } & {
+  1: Rotation;
+  2: Rotation;
+  3: Rotation;
+  4: Rotation;
+  5: Rotation;
+  6: Rotation;
+};
+
+const faceRotations: FaceRotations = {
   1: { x: 0, y: 0, z: 0 },         // front
   2: { x: 0, y: -90, z: 0 },       // left (value-2 is on the left face)
   3: { x: -90, y: 0, z: 0 },       // top
@@ -82,7 +92,10 @@ const rollDice = (newValue?: number, onComplete?: () => void) => {
   gsap.killTweensOf(diceRef.value);
   
   // Get the final rotation for the current value
-  const finalRotation = faceRotations[currentValue.value];
+  const value = currentValue.value;
+  // Ensure value is a valid dice value (1-6)
+  const diceValue = value >= 1 && value <= 6 ? value as 1|2|3|4|5|6 : 1;
+  const finalRotation = faceRotations[diceValue];
   
   // Add more pronounced random tilt for realism
   // Increased tilt range from ±5 to ±15 degrees
@@ -165,7 +178,10 @@ const rollDice = (newValue?: number, onComplete?: () => void) => {
 // Initialize the dice with the correct rotation on mount
 onMounted(() => {
   if (diceRef.value) {
-    const initialRotation = faceRotations[currentValue.value];
+    const value = currentValue.value;
+    // Ensure value is a valid dice value (1-6)
+    const diceValue = value >= 1 && value <= 6 ? value as 1|2|3|4|5|6 : 1;
+    const initialRotation = faceRotations[diceValue];
     
     // Add more pronounced tilt for initial position
     const tiltX = Math.random() * 24 - 12;
@@ -217,7 +233,9 @@ const testAllFaces = () => {
     }
     
     currentValue.value = currentFace;
-    const rotation = faceRotations[currentFace];
+    // Ensure value is a valid dice value (1-6)
+    const diceValue = currentFace >= 1 && currentFace <= 6 ? currentFace as 1|2|3|4|5|6 : 1;
+    const rotation = faceRotations[diceValue];
     
     // Add more pronounced tilt for test function
     const tiltX = Math.random() * 24 - 12;
