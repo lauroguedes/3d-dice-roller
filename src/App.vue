@@ -10,11 +10,12 @@ const toggleTheme = () => {
 };
 
 const diceCount = ref(1);
-const diceValues = ref<number[]>([1]);
+const diceValues = ref<number[]>([]);
 const diceRefs = ref<any[]>([]);
 const history = ref<{ values: number[], total: number, timestamp: string }[]>([]);
 const isRolling = ref(false);
 const maxDiceCount = 3;
+const hasRolled = ref(false);
 
 const totalValue = computed(() => {
   return diceValues.value.reduce((sum, val) => sum + val, 0);
@@ -76,6 +77,7 @@ const rollDice = () => {
           });
           
           isRolling.value = false;
+          hasRolled.value = true;
           
           // Show roll complete alert briefly
           showRollCompleteAlert.value = true;
@@ -113,18 +115,13 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-  // Initial roll without animation
+  // Initial random values without animation
   const initialValues = Array(diceCount.value).fill(0).map(() => 
     Math.floor(Math.random() * 6) + 1
   );
   diceValues.value = initialValues;
   
-  // Add to history
-  history.value.unshift({
-    values: [...initialValues],
-    total: initialValues.reduce((a, b) => a + b, 0),
-    timestamp: new Date().toLocaleTimeString()
-  });
+  // No history entry for initial state
 });
 </script>
 
@@ -158,7 +155,7 @@ onMounted(() => {
           <div style="display: flex; justify-content: center;">
             <transition name="fade">
               <div 
-                v-if="!isRolling" 
+                v-if="!isRolling && hasRolled" 
                 class="total-result"
                 :style="{ backgroundColor: showRollCompleteAlert ? 'var(--secondary-color)' : 'var(--primary-color)' }"
               >
