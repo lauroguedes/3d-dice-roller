@@ -132,10 +132,10 @@ onMounted(() => {
   <div class="container">
     <!-- Header -->
     <header>
-      <h1>3D Dice Roller</h1>
+      <h1><i class="ri-shapes-line"></i> 3D Dice Roller</h1>
       <button class="theme-toggle" @click="toggleTheme">
-        <span v-if="isDarkMode">☀️</span>
-        <span v-else>🌙</span>
+        <i v-if="isDarkMode" class="ri-sun-line"></i>
+        <i v-else class="ri-moon-line"></i>
       </button>
     </header>
 
@@ -162,7 +162,8 @@ onMounted(() => {
                 class="total-result"
                 :style="{ backgroundColor: showRollCompleteAlert ? 'var(--secondary-color)' : 'var(--primary-color)' }"
               >
-                <span v-if="showRollCompleteAlert" style="margin-right: 8px;">✓</span>
+                <i v-if="showRollCompleteAlert" class="ri-check-line"></i>
+                <i v-else class="ri-equalizer-line"></i>
                 Total: {{ totalValue }}
               </div>
             </transition>
@@ -178,13 +179,15 @@ onMounted(() => {
                 class="counter-btn" 
                 @click="decrementDiceCount"
                 :disabled="isRolling || diceCount <= 1"
-              >-</button>
-              <span class="counter-label">{{ diceCount }} {{ diceCount === 1 ? 'die' : 'dice' }}</span>
+                title="Decrease dice count"
+              ><i class="ri-subtract-line"></i></button>
+              <span class="counter-label"><i class="ri-dice-line"></i> {{ diceCount }} {{ diceCount === 1 ? 'die' : 'dice' }}</span>
               <button 
                 class="counter-btn" 
                 @click="incrementDiceCount"
                 :disabled="isRolling || diceCount >= maxDiceCount"
-              >+</button>
+                title="Increase dice count"
+              ><i class="ri-add-line"></i></button>
             </div>
 
             <!-- Roll Button -->
@@ -194,6 +197,7 @@ onMounted(() => {
               :disabled="isRolling"
             >
               <span v-if="isRolling" class="loading"></span>
+              <i v-if="!isRolling" class="ri-restart-line"></i>
               {{ isRolling ? 'Rolling...' : 'Roll Dice' }}
             </button>
           </div>
@@ -202,26 +206,28 @@ onMounted(() => {
         <!-- History Section -->
         <div class="history-section card">
           <div class="history-header">
-            <h2>Roll History</h2>
+            <h2><i class="ri-history-line"></i> Roll History</h2>
             <button 
               class="clear-btn" 
               @click="clearHistory"
               :disabled="history.length === 0"
+              title="Clear history"
             >
-              Clear
+              <i class="ri-delete-bin-line"></i> Clear
             </button>
           </div>
 
           <div v-if="history.length > 0" class="history-list">
             <div v-for="(roll, index) in history" :key="index" class="history-item">
-              <span class="history-values">{{ roll.values.join(', ') }}</span>
-              <span class="history-time">{{ roll.timestamp }}</span>
+              <span class="history-values"><i class="ri-dice-multiple-line"></i> {{ roll.values.join(', ') }}</span>
+              <span class="history-time"><i class="ri-time-line"></i> {{ roll.timestamp }}</span>
               <span class="history-total">Total: {{ roll.total }}</span>
             </div>
           </div>
 
           <div v-else class="empty-history">
-            No roll history yet
+            <i class="ri-inbox-line empty-icon"></i>
+            <p>No roll history yet</p>
           </div>
         </div>
       </div>
@@ -229,7 +235,7 @@ onMounted(() => {
 
     <!-- Footer -->
     <footer>
-      <p>&copy; {{ new Date().getFullYear() }} - 3D Dice Roller</p>
+      <p><i class="ri-copyright-line"></i> {{ new Date().getFullYear() }} - 3D Dice Roller</p>
     </footer>
   </div>
 </template>
@@ -242,5 +248,41 @@ footer {
   border-top: 1px solid var(--border-color);
   font-size: 0.9rem;
   color: #888;
+}
+
+i {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.theme-toggle i {
+  font-size: 1.5rem;
+  margin-right: 0;
+}
+
+.roll-btn i {
+  font-size: 1.1rem;
+}
+
+.counter-btn i {
+  margin-right: 0;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+  display: block;
+}
+
+.empty-history {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-history p {
+  margin: 0;
 }
 </style>
