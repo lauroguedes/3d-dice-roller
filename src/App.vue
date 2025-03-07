@@ -232,7 +232,18 @@ onMounted(() => {
 
     <!-- Footer -->
     <footer>
-      <p><i class="ri-copyright-line"></i> {{ new Date().getFullYear() }} - 3D Dice Roller</p>
+      <p>
+        <i class="ri-copyright-line"></i> {{ new Date().getFullYear() }} - 3D Dice Roller - 
+        Created by <a href="https://lauroguedes.dev" target="_blank" rel="noopener noreferrer">Lauro Guedes</a>
+      </p>
+      <div class="social-links">
+        <a href="https://linkedin.com/in/lauroguedes" target="_blank" rel="noopener noreferrer" title="LinkedIn">
+          <i class="ri-linkedin-fill"></i>
+        </a>
+        <a href="https://github.com/lauroguedes/3d-dice-roller" target="_blank" rel="noopener noreferrer" title="GitHub">
+          <i class="ri-github-fill"></i>
+        </a>
+      </div>
     </footer>
   </div>
 </template>
@@ -245,6 +256,40 @@ footer {
   border-top: 1px solid var(--border-color);
   font-size: 0.9rem;
   color: #888;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-links a {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.social-links a:hover {
+  color: var(--secondary-color);
+  transform: scale(1.1);
+}
+
+.social-links i {
+  margin-right: 0;
+}
+
+footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+footer a:hover {
+  color: var(--secondary-color);
 }
 
 i {
