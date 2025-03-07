@@ -33,31 +33,37 @@ const highlightActiveFace = () => {
   });
 
   if (activeFace.value) {
-    gsap.timeline()
-      .to(activeFace.value, {
-        duration: 0.2,
-        backgroundColor: '#ffeb3b',
-        scale: 1.1,
-        ease: "power1.inOut"
-      })
-      .to(activeFace.value, {
-        duration: 0.2,
-        backgroundColor: 'white',
-        scale: 1,
-        ease: "power1.inOut"
-      })
-      .to(activeFace.value, {
-        duration: 0.2,
-        backgroundColor: '#ffeb3b',
-        scale: 1.1,
-        ease: "power1.inOut"
-      })
-      .to(activeFace.value, {
-        duration: 0.2,
-        backgroundColor: 'white',
-        scale: 1,
-        ease: "power1.inOut"
-      });
+    // Get all dots on the active face
+    const dots = activeFace.value.querySelectorAll('.dot');
+    
+    // Create a timeline for the dots
+    const tl = gsap.timeline();
+    
+    // Pulse the dots
+    tl.to(dots, {
+      duration: 0.2,
+      backgroundColor: '#ffeb3b',
+      scale: 1.3,
+      ease: "power1.inOut"
+    })
+    .to(dots, {
+      duration: 0.2,
+      backgroundColor: '#333',
+      scale: 1,
+      ease: "power1.inOut"
+    })
+    .to(dots, {
+      duration: 0.2,
+      backgroundColor: '#ffeb3b',
+      scale: 1.3,
+      ease: "power1.inOut"
+    })
+    .to(dots, {
+      duration: 0.2,
+      backgroundColor: '#333',
+      scale: 1,
+      ease: "power1.inOut"
+    });
   }
 };
 
@@ -253,12 +259,39 @@ defineExpose({ rollDice, testAllFaces });
     </div>
     <div class="dice-wrapper">
       <div ref="diceRef" class="dice" :class="{ rolling: isRolling }">
-        <div class="face front value-1">1</div>
-        <div class="face back value-6">6</div>
-        <div class="face right value-2">2</div>
-        <div class="face left value-5">5</div>
-        <div class="face top value-3">3</div>
-        <div class="face bottom value-4">4</div>
+        <div class="face front value-1">
+          <div class="dot center"></div>
+        </div>
+        <div class="face back value-6">
+          <div class="dot top-left"></div>
+          <div class="dot top-right"></div>
+          <div class="dot middle-left"></div>
+          <div class="dot middle-right"></div>
+          <div class="dot bottom-left"></div>
+          <div class="dot bottom-right"></div>
+        </div>
+        <div class="face right value-2">
+          <div class="dot top-right"></div>
+          <div class="dot bottom-left"></div>
+        </div>
+        <div class="face left value-5">
+          <div class="dot top-left"></div>
+          <div class="dot top-right"></div>
+          <div class="dot center"></div>
+          <div class="dot bottom-left"></div>
+          <div class="dot bottom-right"></div>
+        </div>
+        <div class="face top value-3">
+          <div class="dot top-right"></div>
+          <div class="dot center"></div>
+          <div class="dot bottom-left"></div>
+        </div>
+        <div class="face bottom value-4">
+          <div class="dot top-left"></div>
+          <div class="dot top-right"></div>
+          <div class="dot bottom-left"></div>
+          <div class="dot bottom-right"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -287,21 +320,64 @@ defineExpose({ rollDice, testAllFaces });
   height: 100%;
   background: white;
   border: 2px solid #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2em;
-  font-weight: bold;
-  color: #333;
   box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   backface-visibility: visible;
   transform-style: preserve-3d;
   transform-origin: center center;
+  padding: 10px;
 }
 
 .face.active {
   z-index: 1;
+}
+
+.dot {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #333;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* Dot positions */
+.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.top-left {
+  top: 15%;
+  left: 15%;
+}
+
+.top-right {
+  top: 15%;
+  right: 15%;
+}
+
+.bottom-left {
+  bottom: 15%;
+  left: 15%;
+}
+
+.bottom-right {
+  bottom: 15%;
+  right: 15%;
+}
+
+.middle-left {
+  top: 50%;
+  left: 15%;
+  transform: translateY(-50%);
+}
+
+.middle-right {
+  top: 50%;
+  right: 15%;
+  transform: translateY(-50%);
 }
 
 .front { transform: translateZ(50px); }
@@ -314,6 +390,4 @@ defineExpose({ rollDice, testAllFaces });
 .rolling {
   transition: none;
 }
-
-/* Shadow removed as requested */
 </style>
