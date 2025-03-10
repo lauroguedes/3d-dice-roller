@@ -126,59 +126,36 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <h1><i class="ri-dice-line"></i> 3D Dice Roller</h1>
-      <button class="theme-toggle" @click="toggleTheme">
-        <i v-if="isDarkMode" class="ri-sun-line"></i>
-        <i v-else class="ri-moon-line"></i>
-      </button>
-    </header>
+  <div class="app-wrapper">
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <h1><i class="ri-dice-line"></i> 3D Dice Roller</h1>
+        <button class="theme-toggle" @click="toggleTheme">
+          <i v-if="isDarkMode" class="ri-sun-line"></i>
+          <i v-else class="ri-moon-line"></i>
+        </button>
+      </header>
 
-    <!-- Main content -->
-    <main>
-      <div class="layout-grid">
-        <!-- Dice Card -->
-        <div class="card">
-          <!-- Dice Container -->
-          <div class="dice-container">
-            <Dice 
-              v-for="(value, index) in diceValues" 
-              :key="index"
-              :value="value"
-              ref="diceRefs"
-            />
-          </div>
-
-          <!-- Total Result -->
-          <div style="display: flex; justify-content: center;">
-            <transition name="fade">
-              <div 
-                v-if="!isRolling && hasRolled" 
-                class="total-result"
-                :style="{ backgroundColor: showRollCompleteAlert ? 'var(--secondary-color)' : 'var(--primary-color)' }"
-              >
-                <i v-if="showRollCompleteAlert" class="ri-check-line"></i>
-                <i v-else class="ri-equalizer-line"></i>
-                Total: {{ totalValue }}
-              </div>
-            </transition>
-          </div>
-
-          <div class="divider"></div>
-          
-          <!-- Controls -->
-          <div class="controls">
-            <!-- Dice Count Controls -->
-            <div class="dice-count">
+      <!-- Main content -->
+      <main>
+        <div class="layout-grid">
+          <!-- Dice Card -->
+          <div class="card dice-card">
+            <!-- Roll Instructions in top left -->
+            <div class="roll-instructions">
+              <i class="ri-cursor-fill"></i> Click dice to roll
+            </div>
+            
+            <!-- Dice Count Controls in top right -->
+            <div class="dice-count-controls">
               <button 
                 class="counter-btn" 
                 @click="decrementDiceCount"
                 :disabled="isRolling || diceCount <= 1"
                 title="Decrease dice count"
               ><i class="ri-subtract-line"></i></button>
-              <span class="counter-label"><i class="ri-dice-line"></i> {{ diceCount }} {{ diceCount === 1 ? 'die' : 'dice' }}</span>
+              <span class="counter-label">{{ diceCount }}</span>
               <button 
                 class="counter-btn" 
                 @click="incrementDiceCount"
@@ -186,49 +163,66 @@ onMounted(() => {
                 title="Increase dice count"
               ><i class="ri-add-line"></i></button>
             </div>
+            
+            <!-- Dice Container -->
+            <div class="dice-container">
+              <Dice 
+                v-for="(value, index) in diceValues" 
+                :key="index"
+                :value="value"
+                :index="index"
+                :total="diceCount"
+                ref="diceRefs"
+                @roll-requested="rollDice"
+              />
+            </div>
 
-            <!-- Roll Button -->
-            <button 
-              class="roll-btn" 
-              @click="rollDice"
-              :disabled="isRolling"
-            >
-              <span v-if="isRolling" class="loading"></span>
-              <i v-if="!isRolling" class="ri-restart-line"></i>
-              {{ isRolling ? 'Rolling...' : 'Roll Dice' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- History Section -->
-        <div class="history-section card">
-          <div class="history-header">
-            <h2><i class="ri-history-line"></i> Roll History</h2>
-            <button 
-              class="clear-btn" 
-              @click="clearHistory"
-              :disabled="history.length === 0"
-              title="Clear history"
-            >
-              <i class="ri-delete-bin-line"></i> Clear
-            </button>
-          </div>
-
-          <div v-if="history.length > 0" class="history-list">
-            <div v-for="(roll, index) in history" :key="index" class="history-item">
-              <span class="history-values"><i class="ri-dice-multiple-line"></i> {{ roll.values.join(', ') }}</span>
-              <span class="history-time"><i class="ri-time-line"></i> {{ roll.timestamp }}</span>
-              <span class="history-total">Total: {{ roll.total }}</span>
+            <!-- Total Result -->
+            <div style="display: flex; justify-content: center;">
+              <transition name="fade">
+                <div 
+                  v-if="!isRolling && hasRolled && diceCount > 1" 
+                  class="total-result"
+                  :style="{ backgroundColor: showRollCompleteAlert ? 'var(--secondary-color)' : 'var(--primary-color)' }"
+                >
+                  <i v-if="showRollCompleteAlert" class="ri-check-line"></i>
+                  <i v-else class="ri-equalizer-line"></i>
+                  Total: {{ totalValue }}
+                </div>
+              </transition>
             </div>
           </div>
 
-          <div v-else class="empty-history">
-            <i class="ri-inbox-line empty-icon"></i>
-            <p>No roll history yet</p>
+          <!-- History Section -->
+          <div class="history-section card">
+            <div class="history-header">
+              <h2><i class="ri-history-line"></i> Roll History</h2>
+              <button 
+                class="clear-btn" 
+                @click="clearHistory"
+                :disabled="history.length === 0"
+                title="Clear history"
+              >
+                <i class="ri-delete-bin-line"></i> Clear
+              </button>
+            </div>
+
+            <div v-if="history.length > 0" class="history-list">
+              <div v-for="(roll, index) in history" :key="index" class="history-item">
+                <span class="history-values"><i class="ri-dice-multiple-line"></i> {{ roll.values.join(', ') }}</span>
+                <span class="history-time"><i class="ri-time-line"></i> {{ roll.timestamp }}</span>
+                <span class="history-total">Total: {{ roll.total }}</span>
+              </div>
+            </div>
+
+            <div v-else class="empty-history">
+              <i class="ri-inbox-line empty-icon"></i>
+              <p>No roll history yet</p>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -249,6 +243,16 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex: 1;
+}
+
 footer {
   margin-top: 2rem;
   padding: 1rem;
@@ -260,6 +264,7 @@ footer {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .social-links {
@@ -328,9 +333,144 @@ h1 i {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 2rem 0;
 }
 
 .empty-history p {
   margin: 0;
+}
+
+/* Position the dice count controls in the top right */
+.card {
+  position: relative;
+  padding: 1.5rem;
+}
+
+.dice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.roll-instructions {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  font-size: 0.8rem;
+  color: var(--text-color-secondary, #666);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.roll-instructions i {
+  font-size: 0.7rem;
+}
+
+.dice-count-controls {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
+.counter-btn {
+  background-color: var(--bg-color-secondary);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.counter-btn:hover:not(:disabled) {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.counter-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.counter-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-color);
+  min-width: 16px;
+  text-align: center;
+}
+
+/* Center the dice in the container */
+.dice-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 140px;
+  padding: 1rem 0;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Remove the divider and controls section */
+.divider {
+  display: none;
+}
+
+/* Improve the total result display */
+.total-result {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add scrolling to history list */
+.history-list {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 6px;
+}
+
+/* Fade transition */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

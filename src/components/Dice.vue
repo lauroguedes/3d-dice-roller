@@ -4,12 +4,22 @@ import gsap from 'gsap';
 
 const props = defineProps<{
   value: number;
+  index?: number; // Add index prop to know which dice this is
+  total?: number; // Add total prop to know how many dice there are
 }>();
+
+const emit = defineEmits(['roll-requested']);
 
 const diceRef = ref<HTMLElement | null>(null);
 const isRolling = ref(false);
 const activeFace = ref<HTMLElement | null>(null);
 const currentValue = ref(props.value);
+
+// Computed property to determine if badge should be shown
+const showBadge = () => {
+  // Only show badge if this is part of a multi-dice setup (total > 1)
+  return props.total && props.total > 1;
+};
 
 // Map dice values to specific rotations
 // These rotations are carefully calibrated to match the CSS transforms and template
@@ -30,6 +40,13 @@ const faceRotations: FaceRotations = {
   4: { x: 90, y: 0, z: 0 },        // bottom
   5: { x: 0, y: 90, z: 0 },        // right (value-5 is on the right face)
   6: { x: 0, y: 180, z: 0 }        // back
+};
+
+// Function to handle dice click
+const handleDiceClick = () => {
+  if (!isRolling.value) {
+    emit('roll-requested');
+  }
 };
 
 // Function to highlight the active face after rolling
@@ -271,44 +288,52 @@ defineExpose({ rollDice, testAllFaces });
 </script>
 
 <template>
-  <div style="position: relative;">
-    <div class="dice-badge" v-if="!isRolling">
-      {{ props.value }}
-    </div>
-    <div class="dice-wrapper">
-      <div ref="diceRef" class="dice" :class="{ rolling: isRolling }">
-        <div class="face front value-1">
-          <div class="dot center"></div>
-        </div>
-        <div class="face back value-6">
-          <div class="dot top-left"></div>
-          <div class="dot top-right"></div>
-          <div class="dot middle-left"></div>
-          <div class="dot middle-right"></div>
-          <div class="dot bottom-left"></div>
-          <div class="dot bottom-right"></div>
-        </div>
-        <div class="face right value-2">
-          <div class="dot top-right"></div>
-          <div class="dot bottom-left"></div>
-        </div>
-        <div class="face left value-5">
-          <div class="dot top-left"></div>
-          <div class="dot top-right"></div>
-          <div class="dot center"></div>
-          <div class="dot bottom-left"></div>
-          <div class="dot bottom-right"></div>
-        </div>
-        <div class="face top value-3">
-          <div class="dot top-right"></div>
-          <div class="dot center"></div>
-          <div class="dot bottom-left"></div>
-        </div>
-        <div class="face bottom value-4">
-          <div class="dot top-left"></div>
-          <div class="dot top-right"></div>
-          <div class="dot bottom-left"></div>
-          <div class="dot bottom-right"></div>
+  <div class="dice-container">
+    <div style="position: relative;">
+      <!-- Only show badge if this is part of a multi-dice setup -->
+      <div class="dice-badge" v-if="!isRolling && showBadge()">
+        {{ props.value }}
+      </div>
+      <div class="dice-wrapper">
+        <div 
+          ref="diceRef" 
+          class="dice" 
+          :class="{ rolling: isRolling, clickable: !isRolling }" 
+          @click="handleDiceClick"
+        >
+          <div class="face front value-1">
+            <div class="dot center"></div>
+          </div>
+          <div class="face back value-6">
+            <div class="dot top-left"></div>
+            <div class="dot top-right"></div>
+            <div class="dot middle-left"></div>
+            <div class="dot middle-right"></div>
+            <div class="dot bottom-left"></div>
+            <div class="dot bottom-right"></div>
+          </div>
+          <div class="face right value-2">
+            <div class="dot top-right"></div>
+            <div class="dot bottom-left"></div>
+          </div>
+          <div class="face left value-5">
+            <div class="dot top-left"></div>
+            <div class="dot top-right"></div>
+            <div class="dot center"></div>
+            <div class="dot bottom-left"></div>
+            <div class="dot bottom-right"></div>
+          </div>
+          <div class="face top value-3">
+            <div class="dot top-right"></div>
+            <div class="dot center"></div>
+            <div class="dot bottom-left"></div>
+          </div>
+          <div class="face bottom value-4">
+            <div class="dot top-left"></div>
+            <div class="dot top-right"></div>
+            <div class="dot bottom-left"></div>
+            <div class="dot bottom-right"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -316,11 +341,19 @@ defineExpose({ rollDice, testAllFaces });
 </template>
 
 <style scoped>
+.dice-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
 .dice-wrapper {
   width: 100px;
   height: 100px;
   perspective: 1000px;
-  margin: 20px;
+  margin: 10px;
+  position: relative;
 }
 
 .dice {
@@ -329,7 +362,15 @@ defineExpose({ rollDice, testAllFaces });
   position: relative;
   transform-style: preserve-3d;
   transition: transform 0.1s;
+}
+
+.clickable {
   cursor: pointer;
+}
+
+.clickable:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
 }
 
 .face {
@@ -407,5 +448,31 @@ defineExpose({ rollDice, testAllFaces });
 
 .rolling {
   transition: none;
+  cursor: default;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+.dice-badge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: var(--primary-color, #4caf50);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  z-index: 10;
 }
 </style>
